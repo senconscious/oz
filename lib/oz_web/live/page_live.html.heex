@@ -1,0 +1,27 @@
+<div>
+  <%= cond do %>
+    <% @deals.loading -> %>
+      <.loader></.loader>
+    <% @deals.ok? && @deals.result -> %>
+      <nav>
+        <%= for page_number <- 1..@deals.result.total_pages do %>
+          <.link patch={~p"/?page=#{page_number}"}><%= page_number %></.link>
+        <% end %>
+      </nav>
+      <.table
+        id="deals"
+        rows={@deals.result.entries}
+        row_id={fn %{id: deal_id} -> "deal-#{deal_id}" end}
+        row_click={fn %{id: deal_id} -> push_show_deal_modal(deal_id) end}
+      >
+        <:col :let={deal} label="id"><%= deal.id %></:col>
+        <:col :let={deal} label="name"><%= deal.name %></:col>
+      </.table>
+    <% true -> %>
+  <% end %>
+
+  <.modal id="deal-modal" show={false}>
+    <p :if={@edited_deal}>ID <%= @edited_deal.id %></p>
+    <p :if={@edited_deal}>name <%= @edited_deal.name %></p>
+  </.modal>
+</div>
