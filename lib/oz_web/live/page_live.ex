@@ -63,12 +63,26 @@ defmodule OzWeb.PageLive do
 
   @impl true
   def handle_event("search", %{"page_param" => params}, socket) do
-    socket_connected? = connected?(socket)
+    case PageParam.cast_and_validate(params) do
+      {:ok, casted_params} ->
+        socket_connected? = connected?(socket)
 
-    {:ok, casted_params} = PageParam.cast_and_validate(params)
+        {:noreply,
+         assign_async(socket, :deals, fn ->
+           load_async_assigns(socket_connected?, casted_params)
+         end)}
 
-    {:noreply,
-     assign_async(socket, :deals, fn -> load_async_assigns(socket_connected?, casted_params) end)}
+      {:error, changeset} ->
+        page_param =
+          changeset
+          |> Map.put(:action, :insert)
+          |> to_form()
+
+        {:noreply,
+         socket
+         |> assign(:page_param, page_param)
+         |> put_flash(:error, "Please enter appropriate filters")}
+    end
   end
 
   defp load_async_assigns(false, _), do: {:ok, %{deals: []}}
