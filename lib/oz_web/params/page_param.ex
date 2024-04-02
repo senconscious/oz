@@ -7,15 +7,25 @@ defmodule OzWeb.PageParam do
   embedded_schema do
     field :page, :integer, default: 1
     field :page_size, :integer, default: 10
+    field :name, :string
+  end
+
+  defp fields do
+    __schema__(:fields)
+  end
+
+  defp required_fields do
+    fields() -- [:name]
   end
 
   @doc false
   def changeset(entity, attrs) do
     entity
-    |> cast(attrs, __schema__(:fields))
-    |> validate_required(__schema__(:fields))
+    |> cast(attrs, fields())
+    |> validate_required(required_fields())
     |> validate_number(:page, greater_than: 0)
     |> validate_number(:page_size, greater_than: 0)
+    |> validate_length(:name, min: 3, max: 10)
   end
 
   def cast_and_validate(attrs) do
@@ -26,10 +36,5 @@ defmodule OzWeb.PageParam do
     entity
     |> changeset(attrs)
     |> apply_action(:insert)
-    # |> to_map()
   end
-
-  # def to_map({:ok, struct}), do: {:ok, Map.from_struct(struct)}
-
-  # def to_map(payload), do: payload
 end

@@ -7,8 +7,9 @@ defmodule Oz.Deals.DealQuery do
              end)
 
   def list_paginated(filters) do
-    Process.sleep(1_000)
-    paginate(@database, filters)
+    @database
+    |> by_name(filters)
+    |> paginate(filters)
   end
 
   def fetch(id) do
@@ -17,6 +18,12 @@ defmodule Oz.Deals.DealQuery do
       deal -> {:ok, deal}
     end
   end
+
+  defp by_name(deals, %{name: name}) when is_binary(name) do
+    Enum.filter(deals, fn %{name: deal_name} -> String.contains?(deal_name, name) end)
+  end
+
+  defp by_name(deals, _), do: deals
 
   defp paginate(deals, filters) do
     page = Map.get(filters, :page, 1)

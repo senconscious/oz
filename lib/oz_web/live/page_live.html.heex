@@ -1,4 +1,8 @@
 <div>
+  <.form for={@page_param} phx-change="validate" phx-submit="search">
+    <.input type="text" field={@page_param[:name]} />
+    <button>Search</button>
+  </.form>
   <%= cond do %>
     <% @deals.loading -> %>
       <.loader></.loader>
