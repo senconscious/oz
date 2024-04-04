@@ -11,6 +11,8 @@ defmodule OzWeb.PageLive do
 
   @impl true
   def mount(params, _session, socket) do
+    IO.inspect(self(), label: "SOCKET PID")
+
     socket_connected? = connected?(socket)
 
     page_param = PageParam.changeset(%PageParam{}, params)
@@ -100,5 +102,18 @@ defmodule OzWeb.PageLive do
     %JS{}
     |> JS.push("show_deal_modal", value: %{deal_id: deal_id})
     |> show_modal("deal-modal")
+  end
+
+  def set_value_and_dispatch(options) do
+    set_value_and_dispatch(%JS{}, options)
+  end
+
+  def set_value_and_dispatch(js, options) do
+    value = Keyword.fetch!(options, :value)
+    to = Keyword.fetch!(options, :to)
+
+    js
+    |> JS.set_attribute({"value", value}, to: to)
+    |> JS.dispatch("input", to: to, detail: %{value: value})
   end
 end

@@ -1,6 +1,10 @@
+<button phx-click={set_value_and_dispatch(value: 1, to: "input#form-page-param")}>SET 1</button>
+<button phx-click={set_value_and_dispatch(value: 2, to: "input#form-page-param")}>SET 2</button>
 <div>
-  <.form for={@page_param} phx-change="validate" phx-submit="search">
-    <.input type="text" field={@page_param[:name]} />
+  <.form id="form-page-params" for={@page_param} phx-change="validate" phx-submit="search">
+    <.input id="form-name-param" type="text" field={@page_param[:name]} />
+    <.input id="form-page-param" type="number" field={@page_param[:page]} value={2} />
+    <.input id="form-page-size-param" type="hidden" field={@page_param[:page_size]} />
     <button>Search</button>
   </.form>
   <%= cond do %>
