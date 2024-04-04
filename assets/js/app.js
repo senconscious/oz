@@ -22,8 +22,23 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
+let Hooks = {};
+Hooks.PhoneNumber = {
+  mounted() {
+    this.el.addEventListener("input", (e) => {
+      let match = this.el.value
+        .replace(/\D/g, "")
+        .match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        this.el.value = `${match[1]}-${match[2]}-${match[3]}`;
+      }
+    });
+  },
+};
+
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
+  hooks: Hooks,
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken}
 })
